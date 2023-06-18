@@ -2,19 +2,43 @@ import numpy as np
 
 class Neuron:
     def __init__(self, taille):
+        """C'est du classique ici on va initialiser chaque valeur de l'objet Neuron.
+        tout d'abord tu y retrouve l'architecture du reseau avec les diférentes couches
+        l'entree les cache et la sortis. Tu peus changer le nombre de neurones à ta guise sauf entre et sortie
+        eux ils sont bien defini pour une tache la ils savent ce qu'ils doivent recevoire. Note que plus t'as de 
+        couche et de neurone plus l'ia est performante mais en contre partie elle va etre plus gourmante 
+        en puissance et plus lente (RESTER SUR DU RAISONABLE !!!)
+        """
         self.input_neurons = taille
         self.hidden_neurons = 20
         self.hidden_neurons2 = 20
         self.out_neurons = taille
+
+        """Eux c'est pour l'evaluation de l'IA pendant le jeu suivant ce qu'elle fait on lui ajoute ou retire des points
+        puis on compare à son meilleur score si on fait pire alors on l'entraine sinon on conserve"""
+
         self.tmp = 0  
         self.eval = 0
         self.top_reward = 0
+
+        """La c'est la definition des matrices qui vont lui permettre de donner des resultats comme leur num 
+        l'indique c'est pour les diferentes zones W1 : (3,20) W2 : (20,20) W3 : (20,3) ils permettent la liaison
+        avec modification du resultat comme on le retrouve dans les communcation elec et chimique du cerveau"""
 
         self.W1 = np.random.rand(self.input_neurons, self.hidden_neurons)
         self.W2 = np.random.rand(self.hidden_neurons, self.hidden_neurons2)
         self.W3 = np.random.rand(self.hidden_neurons2, self.out_neurons)
 
     def forward(self, X):
+        """La forward est le nom qu'on donne a la fonction qui parcoure de maniere naturelle le reseau de gauche 
+        a droite. Elle nous donne en sortie une matrice (3,3) de probabilite. Dans le code on conserve uniquement 
+        celle avec la plus grande proba (la tu vois sigmoide car je reflechi encore mais c'est la fonction
+        softmax qui est implemente la)
+        Pour le fonctionnement c'est simple on part des entres qui est le plateau puis on va calculer 
+        Z qui represente les calculs de transfert entre chaque couche pour visualiser tire des traits de chaque 
+        neurone et met lui un nombre c'est sont poid ce que represente les W et avec ça tu calcul les activations
+        soit le nombre qui arrive dans la couche suivante (c'est garce a la fameuse fonction d'activation ici softmax).
+        Ces calculs sont realise jusqu'a la sortie du raison (la 2 couches donc j'ai fait a la main mais sinon on generalise)"""
         X = np.array(X)
         self.z = np.dot(X, self.W1)
         self.a = self.sigmoide(self.z)
@@ -34,6 +58,12 @@ class Neuron:
         return softmax_output * (1 - softmax_output)
     
     def backward(self, X, reward):
+        """La backward sont principe est de parcourir le reseau a l'envert on part de la sortie et on va a l'entree
+        cela est tres utilse car en faisant cela on marque les erreurs et avec ces erreur on apporte des modifications
+        au reseau en modifiant les poids soit les W.
+        POur expliquer les calcul c'est pas evident mais en gros la je prend la note compare a la meilleur puis en fonction
+        d'elle j'etablis les erreurs avec le out_delta et je remonte le reseau avec les activation inverse donc la derive.
+        une fois au bout je me sert de ses calculs pour mettre a jour les poids"""
         X = np.array(X)  # (3,3)
         self.tmp += reward  # (1,)
 
