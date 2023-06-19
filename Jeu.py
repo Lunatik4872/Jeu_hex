@@ -248,7 +248,7 @@ class Jeu:
         if(Graphe.gagnant=="ROUGE"):
             Graphe.gagnant = ""
             self.tourActuel = -1
-            self.NN.backward(self.liste_res,2)
+            self.NN.backward(self.l_res_back,2)
             self.NN.save()
             self.nouvPartie()
             return ROUGE
@@ -256,7 +256,7 @@ class Jeu:
         elif(Graphe.gagnant=="BLEU"):
             Graphe.gagnant = ""
             self.tourActuel = -1
-            self.NN.backward(self.liste_res,2)
+            self.NN.backward(self.l_res_back,2)
             self.NN.save()
             self.nouvPartie()
             return BLEU
@@ -371,11 +371,13 @@ class Jeu:
             res = np.argmax(self.out)
             if (not(self.index() in self.plateaux)):
                 self.genererPlateaux()
+            self.l_res_back = self.liste_res
+            self.l_res_back[res//self.taille][res%self.taille]= -100000
             if (self.grille.hexagones[res//self.taille][res%self.taille].estLibre()!=True) :
-                self.NN.backward(self.liste_res,-3)
+                self.NN.backward(self.l_res_back,-3)
                 self.NN.save()
             else :
-                self.NN.backward(self.liste_res,1)
+                self.NN.backward(self.l_res_back,1)
                 self.NN.save()
             hexagone = self.grille.hexagones[res//self.taille][res%self.taille]
             hexagone.sommet.jouer(self.tourActuel)
