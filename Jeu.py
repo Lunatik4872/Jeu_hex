@@ -248,7 +248,7 @@ class Jeu:
         if(Graphe.gagnant=="ROUGE"):
             Graphe.gagnant = ""
             self.tourActuel = -1
-            self.NN.backward(self.liste_res,self.taille)
+            self.NN.backward(self.liste_res,2)
             self.NN.save()
             self.nouvPartie()
             return ROUGE
@@ -256,7 +256,7 @@ class Jeu:
         elif(Graphe.gagnant=="BLEU"):
             Graphe.gagnant = ""
             self.tourActuel = -1
-            self.NN.backward(self.liste_res,-self.taille)
+            self.NN.backward(self.liste_res,2)
             self.NN.save()
             self.nouvPartie()
             return BLEU
@@ -347,33 +347,36 @@ class Jeu:
         self.liste_res = [[]for i in range(self.taille)]
         for i in range(len(liste)) :
             if liste[i] == '2' :
-                self.liste_res[i//self.taille] += [-2000]
+                self.liste_res[i//self.taille] += [-200000]
             elif liste[i] == '1' :
-                self.liste_res[i//self.taille] += [-1000]
+                self.liste_res[i//self.taille] += [-100000]
             else :
                 self.liste_res[i//self.taille] += [0]
 
         for x in range(self.taille) :
             for y in range(self.taille) :
-                if self.liste_res[x][y] > -1000 :
-                    compt = 0
+                if self.liste_res[x][y] > -100 :
                     nei = self.get_neighbors(x,y)
                     for i in nei :
-                        if self.liste_res[i[0]][i[1]] == -1000 or self.liste_res[i[0]][i[1]] == -2000 :
-                            compt+=1
+                        compt = self.liste_res[x][y] 
+                        if self.liste_res[i[0]][i[1]] == -100000:
+                            compt+=100
+                        if self.liste_res[i[0]][i[1]] == -200000:
+                            compt+=50
                     self.liste_res[x][y] = compt
 
         if (self.joueurs[self.tourActuel] == 1):
             
-            print(self.liste_res)
             self.out = self.NN.forward(self.liste_res)
             res = np.argmax(self.out)
             if (not(self.index() in self.plateaux)):
                 self.genererPlateaux()
             if (self.grille.hexagones[res//self.taille][res%self.taille].estLibre()!=True) :
                 self.NN.backward(self.liste_res,-3)
+                self.NN.save()
             else :
                 self.NN.backward(self.liste_res,1)
+                self.NN.save()
             hexagone = self.grille.hexagones[res//self.taille][res%self.taille]
             hexagone.sommet.jouer(self.tourActuel)
             self.grille.placer(self.tourActuel,hexagone,self.canvas)

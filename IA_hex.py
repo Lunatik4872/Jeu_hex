@@ -39,6 +39,7 @@ class Neuron:
         neurone et met lui un nombre c'est sont poid ce que represente les W et avec ça tu calcul les activations
         soit le nombre qui arrive dans la couche suivante (c'est garce a la fameuse fonction d'activation ici softmax).
         Ces calculs sont realise jusqu'a la sortie du raison (la 2 couches donc j'ai fait a la main mais sinon on generalise)"""
+        print(X)
         X = np.array(X)
         self.z = np.dot(X, self.W1)
         self.a = self.sigmoide(self.z)
