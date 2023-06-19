@@ -359,7 +359,7 @@ class Jeu:
                     compt = 0
                     nei = self.get_neighbors(x,y)
                     for i in nei :
-                        if self.liste_res[i[0]][i[1]] == -1000 :
+                        if self.liste_res[i[0]][i[1]] == -1000 or self.liste_res[i[0]][i[1]] == -2000 :
                             compt+=1
                     self.liste_res[x][y] = compt
 
@@ -371,9 +371,9 @@ class Jeu:
             if (not(self.index() in self.plateaux)):
                 self.genererPlateaux()
             if (self.grille.hexagones[res//self.taille][res%self.taille].estLibre()!=True) :
-                self.NN.backward(self.liste_res,-2)
+                self.NN.backward(self.liste_res,-3)
             else :
-                self.NN.backward(self.liste_res,2)
+                self.NN.backward(self.liste_res,1)
             hexagone = self.grille.hexagones[res//self.taille][res%self.taille]
             hexagone.sommet.jouer(self.tourActuel)
             self.grille.placer(self.tourActuel,hexagone,self.canvas)
