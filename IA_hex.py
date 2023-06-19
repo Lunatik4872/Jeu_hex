@@ -59,7 +59,7 @@ class Neuron:
     
     def backward(self, X, reward):
         """La backward sont principe est de parcourir le reseau a l'envert on part de la sortie et on va a l'entree
-        cela est tres utilse car en faisant cela on marque les erreurs et avec ces erreur on apporte des modifications
+        cela est tres utile car en faisant cela on marque les erreurs et avec ces erreurs on apporte des modifications
         au reseau en modifiant les poids soit les W.
         POur expliquer les calcul c'est pas evident mais en gros la je prend la note compare a la meilleur puis en fonction
         d'elle j'etablis les erreurs avec le out_delta et je remonte le reseau avec les activation inverse donc la derive.
