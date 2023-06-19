@@ -32,8 +32,7 @@ class Neuron:
     def forward(self, X):
         """La forward est le nom qu'on donne a la fonction qui parcoure de maniere naturelle le reseau de gauche 
         a droite. Elle nous donne en sortie une matrice (3,3) de probabilite. Dans le code on conserve uniquement 
-        celle avec la plus grande proba (la tu vois sigmoide car je reflechi encore mais c'est la fonction
-        softmax qui est implemente la)
+        celle avec la plus grande proba
         Pour le fonctionnement c'est simple on part des entres qui est le plateau puis on va calculer 
         Z qui represente les calculs de transfert entre chaque couche pour visualiser tire des traits de chaque 
         neurone et met lui un nombre c'est sont poid ce que represente les W et avec ça tu calcul les activations
@@ -42,20 +41,20 @@ class Neuron:
         print(X)
         X = np.array(X)
         self.z = np.dot(X, self.W1)
-        self.a = self.sigmoide(self.z)
+        self.a = self.softmax(self.z)
         print(self.a.shape)
         self.z2 = np.dot(self.a,self.W2)
-        self.a2 = self.sigmoide(self.z2)
-        self.out = self.sigmoide(np.dot(self.a2, self.W3))
+        self.a2 = self.softmax(self.z2)
+        self.out = self.softmax(np.dot(self.a2, self.W3))
         print(self.out)
         return self.out
 
-    def sigmoide(self, Z):
+    def softmax(self, Z):
         e_x = np.exp(Z - np.max(Z, axis=0))
         return e_x / np.sum(e_x, axis=0)
 
-    def sigmoide_derivative(self, Z):
-        softmax_output = self.sigmoide(Z)
+    def softmax_derivative(self, Z):
+        softmax_output = self.softmax(Z)
         return softmax_output * (1 - softmax_output)
     
     def backward(self, X, reward):
@@ -74,13 +73,13 @@ class Neuron:
         self.top_reward = np.maximum(self.top_reward, reward)  # (1,)
         self.eval = self.top_reward  # (1,)
 
-        self.out_delta = reward * self.sigmoide_derivative(self.out)  # (1,) * (3,3) = (3,3)
+        self.out_delta = reward * self.softmax_derivative(self.out)  # (1,) * (3,3) = (3,3)
 
         self.a2_error = self.out_delta  # (3,3)
-        self.a2_delta = self.a2_error.dot(self.W3.T) * self.sigmoide_derivative(self.a2)  # (3,3) * (3,20) = (3,20)
+        self.a2_delta = self.a2_error.dot(self.W3.T) * self.softmax_derivative(self.a2)  # (3,3) * (3,20) = (3,20)
 
         self.a_error = self.a2_delta.dot(self.W2.T)  # (3,20) * (20,20) = (3,20)
-        self.a_delta = self.a_error * self.sigmoide_derivative(self.a)  # (3,20) * (3,20) = (3,20)
+        self.a_delta = self.a_error * self.softmax_derivative(self.a)  # (3,20) * (3,20) = (3,20)
 
         self.W1 += X.T.dot(self.a_delta)  # (3,3) * (3,20) = (3,20)
         self.W2 += self.a.T.dot(self.a2_delta)  # (20,3) * (3,20) = (20,20)
