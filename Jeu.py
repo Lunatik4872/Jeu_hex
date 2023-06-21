@@ -353,12 +353,12 @@ class Jeu:
                 if liste[i] == '2' :
                     self.liste_res[i//self.taille] += [-200000]
                 elif liste[i] == '1' :
-                    self.liste_res[i//self.taille] += [-100000]
+                    self.liste_res[i//self.taille] += [-1]
                 else :
                     self.liste_res[i//self.taille] += [0]
             else :
                 if liste[i] == '2' :
-                    self.liste_res[i//self.taille] += [-100000]
+                    self.liste_res[i//self.taille] += [-1]
                 elif liste[i] == '1' :
                     self.liste_res[i//self.taille] += [-200000]
                 else :
@@ -367,20 +367,14 @@ class Jeu:
 
         for x in range(self.taille) :
             for y in range(self.taille) :
-                if self.liste_res[x][y] > -100 :
+                if self.liste_res[x][y] > -1 :
                     nei = self.get_neighbors(x,y)
                     for i in nei :
                         compt = self.liste_res[x][y]
-                        if self.tour == 0 :
-                            if self.liste_res[i[0]][i[1]] == -100000:
-                                compt+=1000
-                            elif self.liste_res[i[0]][i[1]] == -200000:
-                                compt+=800
-                        else :
-                            if self.liste_res[i[0]][i[1]] == -100000:
-                                compt+=800
-                            elif self.liste_res[i[0]][i[1]] == -200000:
-                                compt+=1000
+                        if self.liste_res[i[0]][i[1]] == -100000:
+                            compt+=100000
+                        elif self.liste_res[i[0]][i[1]] == -200000:
+                            compt+=200000
                     self.liste_res[x][y] = compt
 
         if (self.joueurs[self.tourActuel] == 1):
