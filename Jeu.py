@@ -250,7 +250,7 @@ class Jeu:
             Graphe.gagnant = ""
             self.tourActuel = -1
             self.tour = 0
-            self.NN.backward(self.l_res_back,3)
+            self.NN.backward(self.l_res_back,2)
             self.NN.save()
             self.nouvPartie()
             return ROUGE
@@ -259,7 +259,7 @@ class Jeu:
             Graphe.gagnant = ""
             self.tourActuel = -1
             self.tour = 0
-            self.NN.backward(self.l_res_back,3)
+            self.NN.backward(self.l_res_back,2)
             self.NN.save()
             self.nouvPartie()
             return BLEU
@@ -351,7 +351,7 @@ class Jeu:
         for i in range(len(liste)) :
             if self.tour == 0 :
                 if liste[i] == '2' :
-                    self.liste_res[i//self.taille] += [-200000]
+                    self.liste_res[i//self.taille] += [-2]
                 elif liste[i] == '1' :
                     self.liste_res[i//self.taille] += [-1]
                 else :
@@ -360,9 +360,9 @@ class Jeu:
                 if liste[i] == '2' :
                     self.liste_res[i//self.taille] += [-1]
                 elif liste[i] == '1' :
-                    self.liste_res[i//self.taille] += [-200000]
+                    self.liste_res[i//self.taille] += [-2]
                 else :
-                    self.liste_res[i//self.taille] += [0]
+                    self.liste_res[i//self.taille] += [1]
             
 
         for x in range(self.taille) :
@@ -371,10 +371,10 @@ class Jeu:
                     nei = self.get_neighbors(x,y)
                     for i in nei :
                         compt = self.liste_res[x][y]
-                        if self.liste_res[i[0]][i[1]] == -100000:
-                            compt+=100000
-                        elif self.liste_res[i[0]][i[1]] == -200000:
-                            compt+=200000
+                        if self.liste_res[i[0]][i[1]] == -1:
+                            compt+=10
+                        elif self.liste_res[i[0]][i[1]] == -2:
+                            compt+=5
                     self.liste_res[x][y] = compt
 
         if (self.joueurs[self.tourActuel] == 1):
@@ -384,9 +384,8 @@ class Jeu:
             if (not(self.index() in self.plateaux)):
                 self.genererPlateaux()
             self.l_res_back = self.liste_res
-            self.l_res_back[res//self.taille][res%self.taille]= -100000
             if (self.grille.hexagones[res//self.taille][res%self.taille].estLibre()!=True) :
-                self.NN.backward(self.l_res_back,-3)
+                self.NN.backward(self.l_res_back,-1)
                 self.NN.save()
             else :
                 self.NN.backward(self.l_res_back,1)
@@ -405,5 +404,5 @@ class Jeu:
                         self.tour = 1
                     else :
                         self.tour = 0
-                    self.fenetre.after(10,self.jouerIA)
+                    self.fenetre.after(100,self.jouerIA)
 Jeu()

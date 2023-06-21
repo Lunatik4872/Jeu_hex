@@ -66,8 +66,8 @@ class Neuron:
         X = np.array(X)  # (3,3)
         self.tmp += reward  # (1,)
 
-        if np.any(self.tmp > self.eval):
-            return
+        #if np.any(self.tmp > self.eval):
+            #return
 
         self.top_reward = np.maximum(self.top_reward, reward)  # (1,)
         self.eval = self.top_reward  # (1,)
