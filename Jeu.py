@@ -28,6 +28,7 @@ class Jeu:
         # stocke la configuration (IA ou joueur) de chacun des joueurs
         self.joueurs = {} 
         self.coups = 0
+        self.tour = 0
 
         self.menu()
 
@@ -248,7 +249,8 @@ class Jeu:
         if(Graphe.gagnant=="ROUGE"):
             Graphe.gagnant = ""
             self.tourActuel = -1
-            self.NN.backward(self.l_res_back,2)
+            self.tour = 0
+            self.NN.backward(self.l_res_back,3)
             self.NN.save()
             self.nouvPartie()
             return ROUGE
@@ -256,7 +258,8 @@ class Jeu:
         elif(Graphe.gagnant=="BLEU"):
             Graphe.gagnant = ""
             self.tourActuel = -1
-            self.NN.backward(self.l_res_back,-2)
+            self.tour = 0
+            self.NN.backward(self.l_res_back,3)
             self.NN.save()
             self.nouvPartie()
             return BLEU
@@ -346,23 +349,38 @@ class Jeu:
         liste = self.code()
         self.liste_res = [[]for i in range(self.taille)]
         for i in range(len(liste)) :
-            if liste[i] == '2' :
-                self.liste_res[i//self.taille] += [-200000]
-            elif liste[i] == '1' :
-                self.liste_res[i//self.taille] += [-100000]
+            if self.tour == 0 :
+                if liste[i] == '2' :
+                    self.liste_res[i//self.taille] += [-200000]
+                elif liste[i] == '1' :
+                    self.liste_res[i//self.taille] += [-100000]
+                else :
+                    self.liste_res[i//self.taille] += [0]
             else :
-                self.liste_res[i//self.taille] += [0]
+                if liste[i] == '2' :
+                    self.liste_res[i//self.taille] += [-100000]
+                elif liste[i] == '1' :
+                    self.liste_res[i//self.taille] += [-200000]
+                else :
+                    self.liste_res[i//self.taille] += [0]
+            
 
         for x in range(self.taille) :
             for y in range(self.taille) :
                 if self.liste_res[x][y] > -100 :
                     nei = self.get_neighbors(x,y)
                     for i in nei :
-                        compt = self.liste_res[x][y] 
-                        if self.liste_res[i[0]][i[1]] == -100000:
-                            compt+=1000
-                        if self.liste_res[i[0]][i[1]] == -200000:
-                            compt+=800
+                        compt = self.liste_res[x][y]
+                        if self.tour == 0 :
+                            if self.liste_res[i[0]][i[1]] == -100000:
+                                compt+=1000
+                            elif self.liste_res[i[0]][i[1]] == -200000:
+                                compt+=800
+                        else :
+                            if self.liste_res[i[0]][i[1]] == -100000:
+                                compt+=800
+                            elif self.liste_res[i[0]][i[1]] == -200000:
+                                compt+=1000
                     self.liste_res[x][y] = compt
 
         if (self.joueurs[self.tourActuel] == 1):
@@ -389,5 +407,9 @@ class Jeu:
             victoire = self.victoire()
             if (not victoire):
                 if (self.joueurs[self.tourActuel] == 1): #Si le prochain tour est un IA, le lancer
+                    if self.tour == 0 :
+                        self.tour = 1
+                    else :
+                        self.tour = 0
                     self.fenetre.after(10,self.jouerIA)
 Jeu()

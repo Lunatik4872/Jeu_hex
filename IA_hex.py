@@ -10,8 +10,8 @@ class Neuron:
         en puissance et plus lente (RESTER SUR DU RAISONABLE !!!)
         """
         self.input_neurons = taille
-        self.hidden_neurons = 30
-        self.hidden_neurons2 = 30
+        self.hidden_neurons = 50
+        self.hidden_neurons2 = 50
         self.out_neurons = taille
 
         """Eux c'est pour l'evaluation de l'IA pendant le jeu suivant ce qu'elle fait on lui ajoute ou retire des points
@@ -42,7 +42,6 @@ class Neuron:
         X = np.array(X)
         self.z = np.dot(X, self.W1)
         self.a = self.softmax(self.z)
-        print(self.a.shape)
         self.z2 = np.dot(self.a,self.W2)
         self.a2 = self.softmax(self.z2)
         self.out = self.softmax(np.dot(self.a2, self.W3))
@@ -67,7 +66,7 @@ class Neuron:
         X = np.array(X)  # (3,3)
         self.tmp += reward  # (1,)
 
-        if np.any(self.tmp >= self.eval):
+        if np.any(self.tmp > self.eval):
             return
 
         self.top_reward = np.maximum(self.top_reward, reward)  # (1,)
