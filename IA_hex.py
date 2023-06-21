@@ -10,8 +10,8 @@ class Neuron:
         en puissance et plus lente (RESTER SUR DU RAISONABLE !!!)
         """
         self.input_neurons = taille
-        self.hidden_neurons = 20
-        self.hidden_neurons2 = 20
+        self.hidden_neurons = 30
+        self.hidden_neurons2 = 30
         self.out_neurons = taille
 
         """Eux c'est pour l'evaluation de l'IA pendant le jeu suivant ce qu'elle fait on lui ajoute ou retire des points

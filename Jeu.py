@@ -256,7 +256,7 @@ class Jeu:
         elif(Graphe.gagnant=="BLEU"):
             Graphe.gagnant = ""
             self.tourActuel = -1
-            self.NN.backward(self.l_res_back,2)
+            self.NN.backward(self.l_res_back,-2)
             self.NN.save()
             self.nouvPartie()
             return BLEU
@@ -360,9 +360,9 @@ class Jeu:
                     for i in nei :
                         compt = self.liste_res[x][y] 
                         if self.liste_res[i[0]][i[1]] == -100000:
-                            compt+=100
+                            compt+=1000
                         if self.liste_res[i[0]][i[1]] == -200000:
-                            compt+=50
+                            compt+=800
                     self.liste_res[x][y] = compt
 
         if (self.joueurs[self.tourActuel] == 1):
