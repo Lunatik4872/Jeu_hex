@@ -385,10 +385,10 @@ class Jeu:
                 self.genererPlateaux()
             self.l_res_back = self.liste_res
             if (self.grille.hexagones[res//self.taille][res%self.taille].estLibre()!=True) :
-                self.NN.backward(self.l_res_back,-1)
+                self.NN.backward(self.l_res_back,-0.001)
                 self.NN.save()
             else :
-                self.NN.backward(self.l_res_back,1)
+                self.NN.backward(self.l_res_back,0.001)
                 self.NN.save()
             hexagone = self.grille.hexagones[res//self.taille][res%self.taille]
             hexagone.sommet.jouer(self.tourActuel)

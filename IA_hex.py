@@ -18,8 +18,8 @@ class Neuron:
         puis on compare à son meilleur score si on fait pire alors on l'entraine sinon on conserve"""
 
         self.tmp = 0  
-        self.eval = 0
-        self.top_reward = 0
+        #self.eval = 0
+        #self.top_reward = 0
 
         """La c'est la definition des matrices qui vont lui permettre de donner des resultats comme leur num 
         l'indique c'est pour les diferentes zones W1 : (3,20) W2 : (20,20) W3 : (20,3) ils permettent la liaison
@@ -69,10 +69,10 @@ class Neuron:
         #if np.any(self.tmp > self.eval):
             #return
 
-        self.top_reward = np.maximum(self.top_reward, reward)  # (1,)
-        self.eval = self.top_reward  # (1,)
+        #self.top_reward = np.maximum(self.top_reward, reward)  # (1,)
+        #self.eval = self.top_reward  # (1,)
 
-        self.out_delta = reward * self.softmax_derivative(self.out)  # (1,) * (3,3) = (3,3)
+        self.out_delta = self.tmp * self.softmax_derivative(self.out)  # (1,) * (3,3) = (3,3)
 
         self.a2_error = self.out_delta  # (3,3)
         self.a2_delta = self.a2_error.dot(self.W3.T) * self.softmax_derivative(self.a2)  # (3,3) * (3,20) = (3,20)
@@ -89,13 +89,13 @@ class Neuron:
         np.save('W2.npy', self.W2)
         np.save('W3.npy', self.W3)
         np.save('tmp.npy', self.tmp)
-        np.save('eval.npy', self.eval)
-        np.save('top_reward.npy', self.top_reward)
+        #np.save('eval.npy', self.eval)
+        #np.save('top_reward.npy', self.top_reward)
 
     def load(self):
         self.W1 = np.load('W1.npy')
         self.W2 = np.load('W2.npy')
         self.W3 = np.load('W3.npy')
         self.tmp = np.load('tmp.npy')
-        self.eval = np.load('eval.npy')
-        self.top_reward = np.load('top_reward.npy')
+        #self.eval = np.load('eval.npy')
+        #self.top_reward = np.load('top_reward.npy')
