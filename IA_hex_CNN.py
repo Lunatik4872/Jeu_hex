@@ -20,7 +20,8 @@ class NN_CNN :
                   'W4': np.random.randn(self.hidden2_NN,self.out_NN)} 
     
     def forward(self,X) :
-        ...
+        X = np.array(X)
+        self.A = {}
 
     def softmax(self, Z):
         e_x = np.exp(Z - np.max(Z, axis=0))
