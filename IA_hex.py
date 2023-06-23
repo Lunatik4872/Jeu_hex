@@ -25,9 +25,9 @@ class Neuron:
         l'indique c'est pour les diferentes zones W1 : (3,20) W2 : (20,20) W3 : (20,3) ils permettent la liaison
         avec modification du resultat comme on le retrouve dans les communcation elec et chimique du cerveau"""
 
-        self.W1 = np.random.rand(self.input_neurons, self.hidden_neurons)
-        self.W2 = np.random.rand(self.hidden_neurons, self.hidden_neurons2)
-        self.W3 = np.random.rand(self.hidden_neurons2, self.out_neurons)
+        self.W1 = np.random.randn(self.input_neurons, self.hidden_neurons)
+        self.W2 = np.random.randn(self.hidden_neurons, self.hidden_neurons2)
+        self.W3 = np.random.randn(self.hidden_neurons2, self.out_neurons)
 
     def forward(self, X):
         """La forward est le nom qu'on donne a la fonction qui parcoure de maniere naturelle le reseau de gauche 
