@@ -4,7 +4,7 @@ from tkinter import*
 from tkinter.messagebox import *
 from tkinter.filedialog import *
 
-import time
+import tensorflow as tf
 
 from random import *
 
@@ -18,7 +18,7 @@ from Graphe import *
 
 from GenerationArbreCoups import *
 
-from IA_hex import *
+from IA_hex_CNN import *
 
 class Jeu:
 
@@ -29,6 +29,8 @@ class Jeu:
         self.joueurs = {} 
         self.coups = 0
         self.tour = 0
+        self.vic = 0
+        self.train = 0
 
         self.menu()
 
@@ -72,7 +74,7 @@ class Jeu:
                     if x != 0:
                         self.sommets[x][y].ajoutVoisin(self.sommets[x-1][y+1])
                     self.sommets[x][y].ajoutVoisin(self.sommets[x][y+1])
-        self.NN = Neuron(self.taille)
+        self.NN = NN_CNN(self.taille)
         self.grille = Grille(Point(10,30),self.taille,self.sommets)
         
         self.tourActuel = ROUGE
@@ -188,6 +190,7 @@ class Jeu:
     #Créer une nouvelle partie (réglages différents)
     def nouvPartie(self):
         self.fenetre.destroy()
+        print("nombre de victoire IA : " + str(self.vic) + '\n' + "nombre de partie : " + str(self.train))
         Graphe.gagnant = ""
         self.taille = 3
         self.sommets = []
@@ -229,8 +232,7 @@ class Jeu:
                     if x != 0:
                         self.sommets[x][y].ajoutVoisin(self.sommets[x-1][y+1])
                     self.sommets[x][y].ajoutVoisin(self.sommets[x][y+1])
-        self.NN = Neuron(self.taille)
-        self.NN.load()
+        self.NN = NN_CNN(self.taille)
         self.grille = Grille(Point(10,30),self.taille,self.sommets)
         
         self.tourActuel = ROUGE
@@ -250,7 +252,10 @@ class Jeu:
             Graphe.gagnant = ""
             self.tourActuel = -1
             self.tour = 0
-            self.NN.backward(self.l_res_back,2)
+            self.vic += 1
+            self.train += 1
+            print("Gagnant : Rouge")
+            self.NN.backward(self.l_res_back,1)
             self.NN.save()
             self.nouvPartie()
             return ROUGE
@@ -259,7 +264,9 @@ class Jeu:
             Graphe.gagnant = ""
             self.tourActuel = -1
             self.tour = 0
-            self.NN.backward(self.l_res_back,2)
+            self.train += 1
+            print("Gagnant : Bleu")
+            self.NN.backward(self.l_res_back,-1)
             self.NN.save()
             self.nouvPartie()
             return BLEU
@@ -380,15 +387,18 @@ class Jeu:
         if (self.joueurs[self.tourActuel] == 1):
             
             self.out = self.NN.forward(self.liste_res)
-            res = np.argmax(self.out)
+            if tf.reduce_all(tf.equal(self.out, self.out[0])) :
+                res = tf.random.uniform((1,), minval=0, maxval=self.taille**2, dtype=tf.int32)[0]
+            else :
+                res = np.argmax(self.out)
             if (not(self.index() in self.plateaux)):
                 self.genererPlateaux()
             self.l_res_back = self.liste_res
             if (self.grille.hexagones[res//self.taille][res%self.taille].estLibre()!=True) :
-                self.NN.backward(self.l_res_back,-0.001)
+                self.NN.backward(self.l_res_back,-1)
                 self.NN.save()
             else :
-                self.NN.backward(self.l_res_back,0.001)
+                self.NN.backward(self.l_res_back,0)
                 self.NN.save()
             hexagone = self.grille.hexagones[res//self.taille][res%self.taille]
             hexagone.sommet.jouer(self.tourActuel)
@@ -400,9 +410,50 @@ class Jeu:
             victoire = self.victoire()
             if (not victoire):
                 if (self.joueurs[self.tourActuel] == 1): #Si le prochain tour est un IA, le lancer
-                    if self.tour == 0 :
-                        self.tour = 1
-                    else :
-                        self.tour = 0
-                    self.fenetre.after(100,self.jouerIA)
+                    self.fenetre.after(10,self.jouerIA_autre)
+    
+    def jouerIA_autre(self):
+        global canvasTour
+        global oval
+        
+        if (self.joueurs[self.tourActuel] == 1):
+            # generer (si besoin) et utiliser l'arbre des coups
+            if (self.taille <= 4 or self.coups >= (self.taille*self.taille - 12)):
+
+                if (not(self.index() in self.plateaux)):
+                    self.genererPlateaux()
+                
+                # si le plateau actuel est un plateau gagnant, jouer le coup correspondant
+                if (self.index() in self.plateaux):
+                    s = int(self.plateaux[self.index()])
+                    hexagone = self.grille.hexagones[s//self.taille][s%self.taille]
+                    while (hexagone.estLibre() == False):
+                        s = randint(0,(self.taille*self.taille)-1)
+                        hexagone = self.grille.hexagones[s//self.taille][s%self.taille]
+
+                # sinon, jouer un coup aleatoire
+                else :
+                    s = randint(0,(self.taille*self.taille)-1)
+                    hexagone = self.grille.hexagones[s//self.taille][s%self.taille]
+                    while (hexagone.estLibre() == False):
+                        s = randint(0,(self.taille*self.taille)-1)
+                        hexagone = self.grille.hexagones[s//self.taille][s%self.taille]
+
+            else:
+                s = randint(0,(self.taille*self.taille)-1)
+                hexagone = self.grille.hexagones[s//self.taille][s%self.taille]
+                while (hexagone.estLibre() == False):
+                    s = randint(0,(self.taille*self.taille)-1)
+                    hexagone = self.grille.hexagones[s//self.taille][s%self.taille]
+
+            hexagone.sommet.jouer(self.tourActuel)
+            self.grille.placer(self.tourActuel,hexagone,self.canvas)
+
+            self.coups = self.coups + 1
+            self.tourSuivant()
+
+            victoire = self.victoire()
+            if (not victoire):
+                if (self.joueurs[self.tourActuel] == 1): #Si le prochain tour est un IA, le lancer
+                    self.fenetre.after(10,self.jouerIA)
 Jeu()
