@@ -75,25 +75,4 @@ class NN_CNN :
                     'W2': tf.Variable(tf.random.normal((self.hidden_NN, self.hidden2_NN))),
                     'W3': tf.Variable(tf.random.normal((self.hidden2_NN, self.out_NN)))}
             
-    """
-    def save(self):
-        model_dir = 'mon_modele/'
-        tf.saved_model.save(self, model_dir)
-        np.save(model_dir+'tmp.npy', self.tmp)
-    
-    def load(self):
-        loaded_model = tf.keras.models.load_model('mon_modele/')
-        tmp = np.load('mon_modele/tmp.npy')
-        self.tmp = tmp
-        
-    def load(self):
-        poids_charges = np.load("IA_W.npy", allow_pickle=True).item()
-        self.W['W1'].assign(poids_charges['W1'])
-        self.W['W2'].assign(poids_charges['W2'])
-        self.W['W3'].assign(poids_charges['W3'])
-        tmp = np.load('tmp.npy')
-        self.tmp = tmp
-        
-    def relu_derivative(self, Z):
-        return tf.where(Z > 0, tf.ones_like(Z), tf.zeros_like(Z))"""
         
