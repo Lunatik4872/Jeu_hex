@@ -349,29 +349,26 @@ class Jeu:
                 neighbors.append((nx, ny))
         return neighbors
 
-    # placer un pion (pour une IA)
-    def jouerIA(self):
-        global canvasTour
-        global oval
+    def liste_ia(self) :
         liste = self.code()
         self.liste_res = [[]for i in range(self.taille)]
-        for i in range(len(liste)) :
-            if self.tour == 0 :
-                if liste[i] == '2' :
-                    self.liste_res[i//self.taille] += [-2]
-                elif liste[i] == '1' :
-                    self.liste_res[i//self.taille] += [-1]
-                else :
-                    self.liste_res[i//self.taille] += [0]
-            else :
-                if liste[i] == '2' :
-                    self.liste_res[i//self.taille] += [-1]
-                elif liste[i] == '1' :
-                    self.liste_res[i//self.taille] += [-2]
-                else :
-                    self.liste_res[i//self.taille] += [1]
-            
+        for i in range(len(liste)):
+            row = i // self.taille
+            col = i % self.taille
 
+            if liste[i] == '2':
+                self.liste_res[row].append(-1)
+            elif liste[i] == '1':
+                self.liste_res[row].append(-2)
+            else:
+                self.liste_res[row].append(1)
+
+            if col == 0:
+                self.liste_res[row][col] = 2
+            elif col == self.taille - 1:
+                self.liste_res[row][col] = 2
+            
+        """
         for x in range(self.taille) :
             for y in range(self.taille) :
                 if self.liste_res[x][y] > -1 :
@@ -379,24 +376,40 @@ class Jeu:
                     for i in nei :
                         compt = self.liste_res[x][y]
                         if self.liste_res[i[0]][i[1]] == -1:
-                            compt+=10
+                            compt+=2
                         elif self.liste_res[i[0]][i[1]] == -2:
-                            compt+=5
-                    self.liste_res[x][y] = compt
+                            compt+=1
+                    self.liste_res[x][y] = compt"""
+
+    # placer un pion (pour une IA)
+    def jouerIA(self):
+        global canvasTour
+        global oval
+        self.liste_ia()
 
         if (self.joueurs[self.tourActuel] == 1):
             
             self.out = self.NN.forward(self.liste_res)
+
             if tf.reduce_all(tf.equal(self.out, self.out[0])) :
                 res = tf.random.uniform((1,), minval=0, maxval=self.taille**2, dtype=tf.int32)[0]
             else :
                 res = np.argmax(self.out)
+
             if (not(self.index() in self.plateaux)):
                 self.genererPlateaux()
             self.l_res_back = self.liste_res
-            if (self.grille.hexagones[res//self.taille][res%self.taille].estLibre()!=True) :
+
+            while not self.grille.hexagones[res//self.taille][res%self.taille].estLibre() :
                 self.NN.backward(self.l_res_back,-1)
+                self.liste_ia()
+                self.out = self.NN.forward(self.liste_res)
+                if tf.reduce_all(tf.equal(self.out, self.out[0])) :
+                    res = tf.random.uniform((1,), minval=0, maxval=self.taille**2, dtype=tf.int32)[0]
+                else :
+                    res = np.argmax(self.out)
                 self.NN.save()
+
             else :
                 self.NN.backward(self.l_res_back,0)
                 self.NN.save()
